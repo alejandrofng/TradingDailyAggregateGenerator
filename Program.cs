@@ -6,7 +6,6 @@ using Axpo;
 using Serilog;
 using AxpoAsignacion.Services.FileStorageService;
 using System.Timers;
-using System.Runtime.CompilerServices;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
@@ -27,28 +26,30 @@ var volumeRetriever = serviceProvider.GetRequiredService<IVolumeRetrieverService
 // Configurar Serilog
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
+    .WriteTo.Console()
     .WriteTo.File("logs/log.txt",
     rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
 var timeInterval = builder.Configuration.GetValue<int>("intervalInMs");
 
-//var autoEvent = new AutoResetEvent(true);
+Log.Information("Configured time interval in ms: {0}", timeInterval);
+volumeRetriever.Retrieve();
 
-//TimerCallback callback = new(volumeRetriever.Retrieve);
-//Timer timer = new(callback, autoEvent,0,timeInterval);
-//autoEvent.WaitOne();
-
-//autoEvent.WaitOne();
 
 System.Timers.Timer aTimer = new (timeInterval);
-aTimer.Elapsed += volumeRetriever.Retrieve;
+aTimer.Elapsed += Task;
 aTimer.AutoReset = true;
-aTimer.Enabled = true;
+aTimer.Start();
+Log.Information($"Timer started at {DateTime.Now.ToUniversalTime():yyyy-MM-ddTHH:mm:ssZ}");
 
-Console.WriteLine("initialized services");
 Console.WriteLine("\nPress the Enter key to exit the application...\n");
-Console.WriteLine("The application started at {0:HH:mm:ss.fff}", DateTime.Now);
 Console.ReadLine();
 aTimer.Stop();
 aTimer.Dispose();
+
+
+void Task(Object source, ElapsedEventArgs e)
+{
+    volumeRetriever.Retrieve();
+}

@@ -1,6 +1,6 @@
 ﻿using Axpo;
-using System.Reflection;
 using System.Text;
+using Serilog;
 
 namespace AxpoAsignacion.Services.FileStorageService
 {
@@ -8,6 +8,7 @@ namespace AxpoAsignacion.Services.FileStorageService
     {
         public void writeFile(List<PowerPeriod> data, DateTime date, string filePath)
         {
+            
             var sb = new StringBuilder();
             // Write the header line
             sb.Append("datetime ; Volume");
@@ -24,7 +25,7 @@ namespace AxpoAsignacion.Services.FileStorageService
             }
 
             string fileName = date.AddDays(1).Date.ToString("yyyyMMdd") + "_" + date.ToString("yyyyMMddHHmm") + ".csv";
-
+            Log.Information($"Saving file at {filePath} {date.ToUniversalTime():yyyy-MM-ddTHH:mm:ssZ}");
             // Save the data to the CSV file
             File.WriteAllText(filePath + "\\"+fileName, sb.ToString());
         }
