@@ -4,7 +4,7 @@ using Polly.Retry;
 using Polly;
 using Axpo;
 using AxpoAsignacion.Services.FileStorageService;
-using System.Timers;
+using Serilog;
 
 namespace AxpoAsignacion.Services.VolumeRetrieverService
 {
@@ -13,20 +13,19 @@ namespace AxpoAsignacion.Services.VolumeRetrieverService
         private readonly IPowerService _powerService;
         private readonly IFileGeneratorService _fileGeneratorService;
         private readonly VolumeRetrieverOptions _options;
-        private readonly ILogger _logger;   
-        public VolumeRetrieverService(IPowerService powerService,IFileGeneratorService fileGeneratorService, ILogger<VolumeRetrieverService> logger, IOptions<VolumeRetrieverOptions> options)
+
+        public VolumeRetrieverService(IPowerService powerService,IFileGeneratorService fileGeneratorService, IOptions<VolumeRetrieverOptions> options)
         {
             _powerService = powerService;
-            _logger = logger;
             _options = options.Value;
             _fileGeneratorService = fileGeneratorService;
         }
 
-        public void Retrieve(Object source, ElapsedEventArgs e)
+        public void Retrieve()
         {
-            Console.WriteLine("Ejecutando ");
             var retryPolicy = initRetryPolicy();
             var date = DateTime.Now;
+            Log.Information($"Executing retrieval of data at {date.ToUniversalTime():yyyy-MM-ddTHH:mm:ssZ}");
             retryPolicy.Execute(() =>
             {
                 var volume = _powerService.GetTrades(date);
@@ -42,7 +41,7 @@ namespace AxpoAsignacion.Services.VolumeRetrieverService
                    sleepDurationProvider: attempt => TimeSpan.FromSeconds(1),
                    onRetry: (exception, sleepDuration, attempt, context) =>
                    {
-                       Console.WriteLine($"Reintento {attempt} después de {sleepDuration.Seconds} segundos debido a: {exception.Message}");
+                       Log.Information($"Retrying attempt {attempt} after {sleepDuration.Seconds} seconds due to exception: {exception.Message}");
                    });
         }
         private List<PowerPeriod> FlattenPowerPeriodsList(List<PowerTrade> data)

@@ -9,6 +9,6 @@ namespace AxpoAsignacion.Services.VolumeRetrieverService
 {
     internal interface IVolumeRetrieverService
     {
-        public void Retrieve(Object source, ElapsedEventArgs e);
+        public void Retrieve();
     }
 }
