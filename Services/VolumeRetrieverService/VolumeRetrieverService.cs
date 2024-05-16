@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Polly.Retry;
 using Polly;
 using Axpo;
@@ -8,7 +7,7 @@ using Serilog;
 
 namespace AxpoAsignacion.Services.VolumeRetrieverService
 {
-    internal class VolumeRetrieverService : IVolumeRetrieverService
+    public class VolumeRetrieverService : IVolumeRetrieverService
     {
         private readonly IPowerService _powerService;
         private readonly IFileGeneratorService _fileGeneratorService;

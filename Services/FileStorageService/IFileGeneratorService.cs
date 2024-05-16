@@ -2,7 +2,7 @@
 
 namespace AxpoAsignacion.Services.FileStorageService
 {
-    internal interface IFileGeneratorService
+    public interface IFileGeneratorService
     {
         public void writeFile(List<PowerPeriod> data, DateTime date, string filePath);
     }

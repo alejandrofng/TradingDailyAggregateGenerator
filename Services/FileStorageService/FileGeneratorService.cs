@@ -4,7 +4,7 @@ using Serilog;
 
 namespace AxpoAsignacion.Services.FileStorageService
 {
-    internal class FileGeneratorService : IFileGeneratorService
+    public class FileGeneratorService : IFileGeneratorService
     {
         public void writeFile(List<PowerPeriod> data, DateTime date, string filePath)
         {
