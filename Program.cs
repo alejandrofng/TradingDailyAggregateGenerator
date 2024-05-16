@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Axpo;
 using Serilog;
-using AxpoAsignacion.Services.FileStorageService;
+using AxpoAsignacion.Services.FileWriteService;
 using System.Timers;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
@@ -17,7 +17,7 @@ builder.Configuration
 builder.Services.Configure<VolumeRetrieverOptions>(builder.Configuration.GetSection(nameof(VolumeRetrieverOptions)));
 
 builder.Services.AddSingleton<IPowerService, PowerService>();
-builder.Services.AddSingleton<IFileGeneratorService, FileGeneratorService>();
+builder.Services.AddSingleton<IFileWriteService, FileWriteService>();
 builder.Services.AddSingleton<IVolumeRetrieverService, VolumeRetrieverService>();
 
 var serviceProvider = builder.Services.BuildServiceProvider();

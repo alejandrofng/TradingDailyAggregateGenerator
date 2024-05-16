@@ -1,24 +1,26 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Polly.Retry;
 using Polly;
 using Axpo;
-using AxpoAsignacion.Services.FileStorageService;
+using AxpoAsignacion.Services.FileWriteService;
 using Serilog;
+using System.Runtime.CompilerServices;
+using AxpoAsignacion.Services.CsvService;
+[assembly: InternalsVisibleTo("AxpoAsignacionTests")]
 
 namespace AxpoAsignacion.Services.VolumeRetrieverService
 {
-    internal class VolumeRetrieverService : IVolumeRetrieverService
+    public class VolumeRetrieverService : IVolumeRetrieverService
     {
         private readonly IPowerService _powerService;
-        private readonly IFileGeneratorService _fileGeneratorService;
+        private readonly ICsvService _csvService;
         private readonly VolumeRetrieverOptions _options;
 
-        public VolumeRetrieverService(IPowerService powerService,IFileGeneratorService fileGeneratorService, IOptions<VolumeRetrieverOptions> options)
+        public VolumeRetrieverService(IPowerService powerService, ICsvService csvService, IOptions<VolumeRetrieverOptions> options)
         {
             _powerService = powerService;
             _options = options.Value;
-            _fileGeneratorService = fileGeneratorService;
+            _csvService = csvService;
         }
 
         public void Retrieve()
@@ -29,7 +31,8 @@ namespace AxpoAsignacion.Services.VolumeRetrieverService
             retryPolicy.Execute(() =>
             {
                 var volume = _powerService.GetTrades(date);
-                _fileGeneratorService.writeFile(FlattenPowerPeriodsList(volume.ToList()), date, _options.Path);
+                var dataToSaveInFile = SumPowerPeriods(volume.ToList());
+                _csvService.SaveCsv(dataToSaveInFile, date, _options.Path);
             });
         }
         private RetryPolicy initRetryPolicy()
@@ -44,11 +47,10 @@ namespace AxpoAsignacion.Services.VolumeRetrieverService
                        Log.Information($"Retrying attempt {attempt} after {sleepDuration.Seconds} seconds due to exception: {exception.Message}");
                    });
         }
-        private List<PowerPeriod> FlattenPowerPeriodsList(List<PowerTrade> data)
+        internal List<PowerPeriod> SumPowerPeriods(List<PowerTrade> data)
         {
-            var jointPowerTrades = data.SelectMany(x => x.Periods).ToList();
-
-            var SumByDate = jointPowerTrades
+            var flattenedPowerPeriods = data.SelectMany(x => x.Periods).ToList();
+            var SumByDate = flattenedPowerPeriods
                 .GroupBy(pair => pair.Period)
                 .Select(grupo => {
                     var period = new PowerPeriod(grupo.Key);
