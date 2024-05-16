@@ -6,6 +6,7 @@ using Axpo;
 using Serilog;
 using AxpoAsignacion.Services.FileWriteService;
 using System.Timers;
+using AxpoAsignacion.Services.CsvService;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
@@ -17,6 +18,7 @@ builder.Configuration
 builder.Services.Configure<VolumeRetrieverOptions>(builder.Configuration.GetSection(nameof(VolumeRetrieverOptions)));
 
 builder.Services.AddSingleton<IPowerService, PowerService>();
+builder.Services.AddSingleton<ICsvService, CsvService>();
 builder.Services.AddSingleton<IFileWriteService, FileWriteService>();
 builder.Services.AddSingleton<IVolumeRetrieverService, VolumeRetrieverService>();
 

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AxpoAsignacion.Services.CsvService
 {
-    public class CsvService
+    public class CsvService: ICsvService
     {
         private readonly IFileWriteService _fileWriteService;
 
