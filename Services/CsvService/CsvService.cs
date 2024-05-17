@@ -25,7 +25,7 @@ namespace AxpoAsignacion.Services.CsvService
             // Write the data lines
             foreach (var item in data)
             {
-                var periodDate = date.Date.AddHours(item.Period - 1);
+                var periodDate = DateTime.SpecifyKind(date.Date.AddHours(item.Period - 1),DateTimeKind.Unspecified);
                 var periodDateOffSet = new DateTimeOffset(periodDate, _timeZoneService.getOffSet(periodDate)).UtcDateTime;
                 sb.Append($"{periodDateOffSet.ToString("yyyy-MM-ddTHH:mm:ssZ")} ; ");
                 sb.Append(item.Volume);

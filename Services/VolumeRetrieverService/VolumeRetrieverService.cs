@@ -26,7 +26,7 @@ namespace AxpoAsignacion.Services.VolumeRetrieverService
         public void Retrieve()
         {
             var retryPolicy = initRetryPolicy();
-            var date = DateTime.Now.AddDays(1).ToUniversalTime();
+            var date = DateTime.SpecifyKind(DateTime.Now.AddDays(1), DateTimeKind.Utc);
             Log.Information($"Executing retrieval of data at {DateTime.Now:yyyy-MM-ddTHH:mm:ssZ}");
             retryPolicy.Execute(() =>
             {

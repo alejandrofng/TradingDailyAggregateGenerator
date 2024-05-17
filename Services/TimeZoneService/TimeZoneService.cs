@@ -7,7 +7,7 @@ namespace AxpoAsignacion.Services.TimeZoneService
         public TimeZoneInfo TimeZone { get; set; } = TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin");
         public TimeZoneService(string? TimeZoneId)
         {
-            TimeZoneId = TimeZoneId ?? "Europe/Berlin";
+            TimeZoneId = string.IsNullOrEmpty(TimeZoneId) ? "Europe/Berlin": TimeZoneId;
             try 
             { 
                 TimeZone = TimeZoneInfo.FindSystemTimeZoneById(TimeZoneId);

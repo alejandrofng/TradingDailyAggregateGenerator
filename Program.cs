@@ -7,8 +7,11 @@ using Serilog;
 using AxpoAsignacion.Services.FileWriteService;
 using System.Timers;
 using AxpoAsignacion.Services.CsvService;
+using AxpoAsignacion.Services.TimeZoneService;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+
+var timeZoneId = builder.Configuration.GetValue<string>("TimeZoneId");
 
 builder.Configuration.Sources.Clear();
 
@@ -21,6 +24,9 @@ builder.Services.AddSingleton<IPowerService, PowerService>();
 builder.Services.AddSingleton<ICsvService, CsvService>();
 builder.Services.AddSingleton<IFileWriteService, FileWriteService>();
 builder.Services.AddSingleton<IVolumeRetrieverService, VolumeRetrieverService>();
+builder.Services.AddSingleton<ITimeZoneService, TimeZoneService>(x=>{
+    return new TimeZoneService(timeZoneId);
+});
 
 var serviceProvider = builder.Services.BuildServiceProvider();
 var volumeRetriever = serviceProvider.GetRequiredService<IVolumeRetrieverService>();
@@ -33,8 +39,6 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 var timeInterval = builder.Configuration.GetValue<int>("intervalInMin");
-
-var timeZoneId = builder.Configuration.GetValue<string>("TimeZoneId");
 
 Log.Information($"Configured time interval in min: {timeInterval}");
 volumeRetriever.Retrieve();
