@@ -25,7 +25,6 @@ builder.Services.AddSingleton<IVolumeRetrieverService, VolumeRetrieverService>()
 var serviceProvider = builder.Services.BuildServiceProvider();
 var volumeRetriever = serviceProvider.GetRequiredService<IVolumeRetrieverService>();
 
-// Configurar Serilog
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .WriteTo.Console()
@@ -33,13 +32,15 @@ Log.Logger = new LoggerConfiguration()
     rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
-var timeInterval = builder.Configuration.GetValue<int>("intervalInMs");
+var timeInterval = builder.Configuration.GetValue<int>("intervalInMin");
 
-Log.Information("Configured time interval in ms: {0}", timeInterval);
+var timeZoneId = builder.Configuration.GetValue<string>("TimeZoneId");
+
+Log.Information($"Configured time interval in min: {timeInterval}");
 volumeRetriever.Retrieve();
 
 
-System.Timers.Timer aTimer = new (timeInterval);
+System.Timers.Timer aTimer = new (timeInterval * 60000);
 aTimer.Elapsed += Task;
 aTimer.AutoReset = true;
 aTimer.Start();
